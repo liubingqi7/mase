@@ -49,8 +49,8 @@ class JSC_S(nn.Module):
     def __init__(self, info):
         super(JSC_S, self).__init__()
         self.config = info
-        self.num_features = self.config["num_features"]
-        self.num_classes = self.config["num_classes"]
+        self.num_features = self.config.num_features
+        self.num_classes = self.config.num_classes
         hidden_layers = [64, 32, 32, 32]
         self.num_neurons = [self.num_features] + hidden_layers + [self.num_classes]
         layer_list = []
@@ -81,6 +81,57 @@ class JSC_S(nn.Module):
             x = l(x)
         return x
 
+class JSC_Lab1(nn.Module):
+    def __init__(self, info):
+        super(JSC_Lab1, self).__init__()
+        self.config = info
+        self.num_features = self.config.num_features
+        self.num_classes = self.config.num_classes
+        hidden_layers = [64, 32]
+        self.num_neurons = [self.num_features] + hidden_layers + [self.num_classes]
+        layer_list = []
+        for i in range(1, len(self.num_neurons)):
+            in_features = self.num_neurons[i - 1]
+            out_features = self.num_neurons[i]
+            bn = nn.BatchNorm1d(out_features)
+            layer = []
+            if i == 1:
+                bn_in = nn.BatchNorm1d(in_features)
+                in_act = nn.ReLU()
+                fc = nn.Linear(in_features, out_features)
+                out_act = nn.ReLU()
+                layer = [bn_in, in_act, fc, bn, out_act]
+            elif i == len(self.num_neurons) - 1:
+                fc = nn.Linear(in_features, out_features)
+                out_act = nn.ReLU()
+                layer = [fc, bn, out_act]
+            else:
+                fc = nn.Linear(in_features, out_features)
+                out_act = nn.ReLU()
+                layer = [fc, out_act]
+            layer_list = layer_list + layer
+        self.module_list = nn.ModuleList(layer_list)
+        
+        self.bn1 = nn.BatchNorm1d(self.num_features)
+        self.bn2 = nn.BatchNorm1d(32)
+        self.bn3 = nn.BatchNorm1d(64)
+        self.conv1 = nn.Conv1d(in_channels=1, out_channels=2, kernel_size=3, stride=1, padding=1)
+        self.fc1 = nn.Linear(self.num_features * 2, 32)
+        self.fc2 = nn.Linear(32, 64)
+        self.fc3 = nn.Linear(64, out_features)
+        self.relu = nn.ReLU()
+
+    def forward(self, x):
+        x = self.bn1(x)
+        x = x.view(x.size(0), 1, -1)
+        x = self.conv1(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc1(x)
+        x = self.fc2(self.relu(self.bn2(x)))
+
+
+        return x
+
 
 # Getters ------------------------------------------------------------------------------
 def get_jsc_toy(info):
@@ -94,3 +145,6 @@ def get_jsc_tiny(info):
 
 def get_jsc_s(info):
     return JSC_S(info)
+
+def get_jsc_lab1(info):
+    return JSC_Lab1(info)
