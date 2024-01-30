@@ -7,22 +7,23 @@ from .calculator import calc_funcs, calc_modules
 from chop.passes.graph.analysis.utils import fetch_attr, load_arg
 
 def flops_statistics_analysis_pass(graph):
-    env = {}
 
-    model, fx_graph, modules = graph.model, graph.fx_graph, graph.modules
-    for node in tqdm(
-        graph.fx_graph.nodes,
-        total=len(list(graph.fx_graph.nodes)),
-        desc="Profiling weight statistics",
-    ):
-        if node.op == "call_module":
-            args = load_arg(node.args, env)
-            kwargs = load_arg(node.kwargs, env)
-            result = modules[node.target](*args, **kwargs)
-            name = node.target
-            count = calc_funcs.calculate_modules(node.meta["mase"].module, node.target, result)
+    total = 0
+    for (i, node) in enumerate(graph.fx_graph.nodes):
+        mase_meta = node.meta["mase"].parameters
+        mase_op = mase_meta["common"]["mase_op"]
+        mase_type = mase_meta["common"]["mase_type"]
 
-            print(count["computations"])
-        env[node.name] = result
+        if mase_type in ["module", "module_related_func"]:
+            data_in_0 = mase_meta["common"]["args"]["data_in_0"]["value"]
+            data_out_0 = mase_meta["common"]["results"]["data_out_0"]["value"]
+            # print(node.meta["mase"].module, data_in_0,data_out_0)
+            count = calc_modules.calculate_modules(node.meta["mase"].module, [data_in_0], [data_out_0])
+            total += count["computations"]
 
-    return graph
+        if mase_type in ["builtin_func"]:
+            print(mase_meta["common"]["args"])
+
+    print(int(total))
+    
+    return graph,{"total_flops": total}

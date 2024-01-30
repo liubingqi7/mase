@@ -3,30 +3,18 @@ Jet Substructure Models used in the LogicNets paper
 """
 
 import torch.nn as nn
-
+import torch
 
 class JSC_Toy(nn.Module):
     def __init__(self, info):
         super(JSC_Toy, self).__init__()
-        self.seq_blocks = nn.Sequential(
-            # 1st LogicNets Layer
-            nn.BatchNorm1d(16),  # input_quant       # 0
-            nn.ReLU(16),  # 1
-            nn.Linear(16, 8),  # linear              # 2
-            nn.BatchNorm1d(8),  # output_quant       # 3
-            nn.ReLU(8),  # 4
-            # 2nd LogicNets Layer
-            nn.Linear(8, 8),  # 5
-            nn.BatchNorm1d(8),  # 6
-            nn.ReLU(8),  # 7
-            # 3rd LogicNets Layer
-            nn.Linear(8, 5),  # 8
-            nn.BatchNorm1d(5),  # 9
-            nn.ReLU(5),
-        )
+        self.param = nn.Parameter(torch.rand(3, 4))
+        self.linear = nn.Linear(16, 5)
 
     def forward(self, x):
-        return self.seq_blocks(x)
+        return torch.topk(torch.sum(
+            self.linear(x + self.linear.weight).relu(), dim=-1), 3)
+
 
 
 class JSC_Tiny(nn.Module):
