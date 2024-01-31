@@ -121,7 +121,7 @@ preds_new = mg.model(xs)
 print(preds_ori, '\n',preds_new)
 
 for node in mg.fx_graph.nodes:
-    print(node.meta["mase"].parameters["common"])
+    print(node.meta["mase"].parameters["software"])
 
 pass_args = {
     "by": "type",                                                            # collect statistics by node name
