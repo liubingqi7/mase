@@ -27,6 +27,7 @@ ipdb
 sentencepiece
 einops
 # deepspeed # let's install it manually as it is not used
+
 pybind11
 tabulate
 tensorboard

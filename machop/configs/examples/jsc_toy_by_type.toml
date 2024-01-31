@@ -11,7 +11,7 @@ project = "jsc-tiny"
 seed = 42
 log_every_n_steps = 5
 # load_name = "../mase_output/toy_toy_tiny/software/training_ckpts/best.ckpt"
-# load_type = "pl"
+load_type = "pl"
 
 [passes.quantize]
 by = "type"
