@@ -1,10 +1,12 @@
 # from .rl import StrategyRL
 from .optuna import SearchStrategyOptuna
 from .base import SearchStrategyBase
+from .brute_force import SearchStrategyBruteForce
 
 
 SEARCH_STRATEGY_MAP = {
     # "rl": StrategyRL,
+    "bf": SearchStrategyBruteForce,
     "optuna": SearchStrategyOptuna,
 }
 

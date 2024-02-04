@@ -1,6 +1,7 @@
 import torch
 
 # from .flop_estimator import run_flop_estimator
+from .flop_estimator import flops_statistics_analysis_pass
 # from .statistical_profiler import run_statistical_profiler
 from .add_metadata import (
     add_common_metadata_analysis_pass,

@@ -24,6 +24,7 @@ from chop.passes.graph import (
     add_common_metadata_analysis_pass,
     init_metadata_analysis_pass,
     add_software_metadata_analysis_pass,
+    flops_statistics_analysis_pass,
 )
 from chop.tools.get_input import InputGenerator
 from chop.tools.checkpoint_load import load_model
@@ -118,7 +119,7 @@ xs, ys = next(inputs)
 preds_ori = ori_mg.model(xs)
 preds_new = mg.model(xs)
 
-print(preds_ori, '\n',preds_new)
+print(preds_ori, '\n' ,preds_new)
 
 for node in mg.fx_graph.nodes:
     print(node.meta["mase"].parameters["software"])
@@ -142,3 +143,6 @@ pass_args = {
 
 # mg, _ = profile_statistics_analysis_pass(mg, pass_args)
 # mg, _ = report_node_meta_param_analysis_pass(mg, {"which": ("software",)})
+
+
+flops_statistics_analysis_pass(ori_mg)

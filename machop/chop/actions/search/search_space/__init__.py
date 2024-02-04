@@ -3,9 +3,10 @@ from .quantization import (
     GraphSearchSpaceMixedPrecisionPTQ,
 )
 from .base import SearchSpaceBase
-
+from .model_arch import ArchitectureSearchSpace
 
 SEARCH_SPACE_MAP = {
+    "graph/arch/redefine_model_arch": ArchitectureSearchSpace,
     "graph/quantize/mixed_precision_ptq": GraphSearchSpaceMixedPrecisionPTQ,
     "module/manual_hf/quantize/llm_mixed_precision_ptq": ManualHFModuleSearchSpaceMixedPrecisionPTQ,
 }

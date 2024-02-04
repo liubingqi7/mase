@@ -119,6 +119,23 @@ class JSC_Lab1(nn.Module):
 
 
         return x
+    
+class JSC_Three_Linear_Layers(nn.Module):
+    def __init__(self, info):
+        super(JSC_Three_Linear_Layers, self).__init__()
+        self.seq_blocks = nn.Sequential(
+            nn.BatchNorm1d(16),  # 0
+            nn.ReLU(16),  # 1
+            nn.Linear(16, 16),  # linear seq_2
+            nn.ReLU(16),  # 3
+            nn.Linear(16, 16),  # linear seq_4
+            nn.ReLU(16),  # 5
+            nn.Linear(16, 5),  # linear seq_6
+            nn.ReLU(5),  # 7
+        )
+
+    def forward(self, x):
+        return self.seq_blocks(x)
 
 
 # Getters ------------------------------------------------------------------------------
@@ -136,3 +153,6 @@ def get_jsc_s(info):
 
 def get_jsc_lab1(info):
     return JSC_Lab1(info)
+
+def get_jsc_three_linear(info):
+    return JSC_Three_Linear_Layers(info)

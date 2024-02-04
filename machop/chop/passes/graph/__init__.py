@@ -16,6 +16,7 @@ from .analysis import (
     add_pruning_metadata_analysis_pass,
     add_natural_sparsity_metadata_analysis_pass,
     hook_inspection_analysis_pass,
+    flops_statistics_analysis_pass,
 )
 from .transforms import (
     prune_transform_pass,
@@ -27,6 +28,7 @@ from .transforms import (
     logicnets_fusion_transform_pass,
     onnx_annotate_transform_pass,
     partition_to_multi_device_transform_pass,
+    redefine_linear_transform_pass
 )
 
 from .interface import (
@@ -57,6 +59,7 @@ ANALYSIS_PASSES = [
     "add_pruning_metadata",
     "add_natural_sparsity",
     "hook_inspection",
+    "flops_statistics_analysis_pass",
 ]
 
 TRANSFORM_PASSES = [
@@ -65,6 +68,7 @@ TRANSFORM_PASSES = [
     "prune",
     "prune_detach_hook" "conv_bn_fusion",
     "logicnets_fusion",
+    "linear_redefine",
 ]
 
 INTERFACE_PASSES = [
@@ -103,8 +107,10 @@ PASSES = {
     "summarize_quantization": summarize_quantization_analysis_pass,
     "prune": prune_transform_pass,
     "prune_detach_hook": prune_detach_hook_transform_pass,
+    "linear_redefine": redefine_linear_transform_pass,
     # "remove_prune_wrappers": prune_unwrap_transform_pass,
     "conv_bn_fusion": conv_bn_fusion_transform_pass,
     "logicnets_fusion": logicnets_fusion_transform_pass,
     "onnx_annotate": onnx_annotate_transform_pass,
+    "flops_statistics": flops_statistics_analysis_pass
 }
