@@ -308,6 +308,7 @@ class ChopCLI:
             "load_name": load_name,
             "load_type": self.args.load_type,
         }
+        print(train_params)
 
         train(**train_params)
         self.logger.info("Training is completed")

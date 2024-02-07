@@ -17,6 +17,8 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from .base import SWRunnerBase
+from ......actions import train
+import lightning as pl
 
 
 def get_optimizer(model, optimizer: str, learning_rate, weight_decay=0.0):
@@ -113,7 +115,15 @@ class RunnerBasicTrain(SWRunnerBase):
         raise NotImplementedError()
     
     def physical_cls_forward(self, batch, model):
-        pass
+        data, labels = batch
+        outputs = model(data)
+        # loss = outputs.requires_grad_()
+        # logits = outputs["logits"]
+        # labels = batch["labels"]
+        # labels = labels[0] if len(labels) == 1 else labels.squeeze()
+        loss = self.metric(outputs, labels).requires_grad_(True)
+        self.loss(loss)
+        return loss
 
     def forward(self, task: str, batch: dict, model):
         if self.model_info.is_vision_model:
@@ -128,6 +138,12 @@ class RunnerBasicTrain(SWRunnerBase):
                     loss = self.nlp_cls_forward(batch, model)
                 case "language_modeling" | "lm":
                     loss = self.nlp_lm_forward(batch, model)
+                case _:
+                    raise ValueError(f"task {self.task} is not supported.")
+        elif self.model_info.physical_data_point_classification:
+            match self.task:
+                case "classification" | "cls":
+                    loss = self.physical_cls_forward(batch, model.model)
                 case _:
                     raise ValueError(f"task {self.task} is not supported.")
         else:
@@ -170,7 +186,7 @@ class RunnerBasicTrain(SWRunnerBase):
             # model = torch.compile(model)
 
             optimizer = get_optimizer(
-                model=model,
+                model=model.model,
                 optimizer=self.config["optimizer"],
                 learning_rate=self.config["learning_rate"],
                 weight_decay=self.config.get("weight_decay", 0.0),
@@ -196,7 +212,7 @@ class RunnerBasicTrain(SWRunnerBase):
                     train_iter = iter(train_dataloader)
                     batch = next(train_iter)
 
-                model.train()
+                model.model.train()
                 loss_i = self.forward(self.task, batch, model)
                 loss_i = loss_i / grad_accumulation_steps
                 loss_i.backward()
@@ -206,12 +222,13 @@ class RunnerBasicTrain(SWRunnerBase):
                     lr_scheduler.step()
                     optimizer.zero_grad()
 
-        else:
+        elif 0:
             max_epochs = self.config["max_epochs"]
             optimizer=self.config["optimizer"]
 
             model.model.to(self.accelerator)
             train_dataloader = data_module.train_dataloader()
+            print(model.model)
 
             match optimizer:
                 case "adamw":
@@ -229,26 +246,76 @@ class RunnerBasicTrain(SWRunnerBase):
                 case _:
                     raise ValueError(f"Unsupported optimizer: {optimizer}")
             
+            criterion = nn.CrossEntropyLoss()
             for epoch in tqdm(range(max_epochs), desc="Epochs Progress"):
+                total_loss = 0
                 for data, labels in tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{max_epochs}", leave=False):
                     data, labels = data.to(self.accelerator), labels.to(self.accelerator)
-                    optimizer.zero_grad()
                     outputs = model.model(data)
-                    loss = nn.CrossEntropyLoss()(outputs, labels)
+                    loss = criterion(outputs, labels)
                     loss.backward()
                     optimizer.step()
+                    optimizer.zero_grad()
+
+                    total_loss += loss.item() * data.size(0)  # 累加损失
+
+                avg_loss = total_loss / len(train_dataloader.dataset)  # 计算平均损失
+                print(f"Epoch {epoch+1}/{max_epochs}, Training Loss: {avg_loss:.4f}")
 
             # train_iter = iter(train_dataloader)
             # batch.to(self.accelerator)
             # optimizer.zero_grad()
             # outputs = model(**batch)
+            model.model.eval()
             val_dataloader = data_module.val_dataloader()
             data, labels = next(iter(val_dataloader))
             data, labels = data.to(self.accelerator), labels.to(self.accelerator)
             outputs = model.model(data)
             loss = nn.CrossEntropyLoss()(outputs, labels)
+            self.metric(outputs, labels)
             self.loss(loss)
             # self.compute()
-                
+        else:
+            pl.seed_everything(0)
+            model.model.to(self.accelerator)
+            plt_trainer_args = {
+            "max_epochs": self.config["max_epochs"],
+            "max_steps": self.config["num_samples"],
+            "devices": 1,
+            "num_nodes": 1,
+            "accelerator": "cuda",
+            "strategy": "auto",
+            "fast_dev_run": False,
+            "precision": "16-mixed",
+            "accumulate_grad_batches": 1,
+            "log_every_n_steps": 10000000,
+            }
+            train_params = {
+            "model": model.model,
+            "model_info": self.model_info,
+            "data_module": data_module,
+            "dataset_info": self.dataset_info,
+            "task": "classification",
+            "optimizer": "adam",
+            "learning_rate": self.config["learning_rate"],
+            "weight_decay": self.config.get("weight_decay", 0.0),
+            "plt_trainer_args": plt_trainer_args,
+            "auto_requeue": False,
+            "save_path": "/home/qizhu/Desktop/Work/mase/mase_output/jsc-three-linear_modified_classification_jsc_2024-02-06/software/training_ckpts",
+            "visualizer": None,
+            "load_name": None,
+            "load_type": "mz",
+            }
+            print(train_params)
+            train(**train_params)
+
+            # model.model.eval()
+            # val_dataloader = data_module.val_dataloader()
+            # data, labels = next(iter(val_dataloader))
+            # data, labels = data.to(self.accelerator), labels.to(self.accelerator)
+            # outputs = model.model(data)
+            # loss = nn.CrossEntropyLoss()(outputs, labels)
+            # self.metric(outputs, labels)
+            # self.loss(loss)
 
         return self.compute()

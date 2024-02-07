@@ -109,7 +109,7 @@ class SearchStrategyOptuna(SearchStrategyBase):
             model, sampled_config, is_eval_mode
         )
         metrics = software_metrics | hardware_metrics
-        print(metrics)
+        print(sampled_config, metrics)
         scaled_metrics = {}
         for metric_name in self.metric_names:
             scaled_metrics[metric_name] = (

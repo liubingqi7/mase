@@ -8,10 +8,10 @@ batch_size = 256
 learning_rate = 1e-2
 accelerator = "gpu"
 project = "jsc-three-linear"
-seed = 42
+seed = 30
 log_every_n_steps = 5
-load_name = "/home/qizhu/Desktop/Work/mase/mase_output/jsc-three-linear_classification_jsc_2024-02-04/software/training_ckpts/best.ckpt"
-load_type = "pl"
+# load_name = "/home/qizhu/Desktop/Work/mase/mase_output/jsc-three-linear_classification_jsc_2024-02-04/software/training_ckpts/best.ckpt"
+# load_type = "pl"
 
 [search.search_space]
 name = "graph/arch/redefine_model_arch"
@@ -35,29 +35,14 @@ bias_frac_width = ["NA"]
 
 [search.search_space.seed.seq_blocks_2.config]
 # if search.search_space.setup.by = "name", this seed will be used to quantize the mase graph node with name "seq_blocks_2"
-name = ["output_only"]
-output_channel_multiplier = [2, 4]
+name = ["linear"]
+channel_multiplier = [1]
 
-[search.search_space.seed.seq_blocks_3.config]
-# if search.search_space.setup.by = "name", this seed will be used to quantize the mase graph node with name "seq_blocks_2"
-name = ["relu"]
-channel_multiplier = [2, 4]
 
 [search.search_space.seed.seq_blocks_4.config]
 # if search.search_space.setup.by = "name", this seed will be used to quantize the mase graph node with name "seq_blocks_2"
-name = ["both"]
-input_channel_multiplier = [2, 4]
-output_channel_multiplier = [4, 8]
-
-[search.search_space.seed.seq_blocks_5.config]
-# if search.search_space.setup.by = "name", this seed will be used to quantize the mase graph node with name "seq_blocks_2"
-name = ["relu"]
-channel_multiplier = [4, 8]
-
-[search.search_space.seed.seq_blocks_6.config]
-# if search.search_space.setup.by = "name", this seed will be used to quantize the mase graph node with name "seq_blocks_2"
-name = ["input_only"]
-input_channel_multiplier = [4, 8]
+name = ["linear"]
+channel_multiplier = [1]
 
 [search.strategy]
 name = "optuna"
@@ -65,19 +50,21 @@ eval_mode = false
 
 [search.strategy.sw_runner.basic_train]
 data_loader = "train_dataloader"
-num_samples = 300000
-max_epochs = 1
+num_samples = 30000
+max_epochs = 3
 optimizer = "adam"
-learning_rate = 1e-2
+learning_rate = 1e-3
+lr_scheduler = "linear"
+num_warmup_steps = 200
 
 [search.strategy.hw_runner.average_bitwidth]
 compare_to = 32 # compare to FP32
 
 [search.strategy.setup]
 n_jobs = 1
-n_trials = 20
+n_trials = 10
 timeout = 20000
-sampler = "BruteForce"
+sampler = "bruteforce"
 # sum_scaled_metrics = true # single objective
 # direction = "maximize"
 sum_scaled_metrics = false # multi objective

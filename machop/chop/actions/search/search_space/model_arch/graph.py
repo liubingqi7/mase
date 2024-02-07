@@ -62,9 +62,9 @@ class ArchitectureSearchSpace(SearchSpaceBase):
             mg, _ = add_common_metadata_analysis_pass(
                 mg, {"dummy_in": self.dummy_input}
             )
-            self.mg = mg
+            # self.mg = mg
         if sampled_config is not None:
-            mg, _ = redefine_linear_transform_pass(self.mg, sampled_config)
+            mg, _ = redefine_linear_transform_pass(mg, sampled_config)
         mg.model.to(self.accelerator)
         return mg
 

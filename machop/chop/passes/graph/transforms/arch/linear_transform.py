@@ -20,9 +20,6 @@ from ...utils import (
 LINEAR_OP = (
     "linear",
     "relu",
-    "output_only",
-    "both",
-    "input_only",
 )
 
 def get_config(config: dict, name: str):
@@ -45,27 +42,32 @@ def redefine_linear_transform_pass(graph, pass_args=None):
     if default is None:
         raise ValueError(f"default value must be provided.")
     i = 0
-    father_node = None
+    last_linear_multi = 1
     for node in graph.fx_graph.nodes:
         i += 1
         # if node name is not matched, it won't be tracked
         config = main_config.get(node.name, default)['config']
-        father_config = main_config.get(father_node.name, default)['config'] if father_node is not None else default['config']
         name = config.get("name", None)
 
-        if name in LINEAR_OP:
+        mase_meta = node.meta["mase"].parameters
+        mase_op = mase_meta["common"]["mase_op"]
+        if mase_op in LINEAR_OP:
             ori_module = graph.modules[node.target]
-            if name == "relu":
-                new_module = nn.ReLU(father_node.meta["mase"].parameters["common"]["args"]["data_out_0"]["shape"][1] * father_config["channel_multiplier"])
+            if mase_op == "relu":
+                new_module = nn.ReLU()
             elif name == "linear":
-                # in_features = ori_module.in_features
+                in_features = ori_module.in_features * last_linear_multi
+                out_features = ori_module.out_features * config["channel_multiplier"]
+                bias = ori_module.bias
+                last_linear_multi = config["channel_multiplier"]
+                new_module = instantiate_linear(in_features, out_features, bias)
+            else:
+                in_features = ori_module.in_features * last_linear_multi
                 out_features = ori_module.out_features
                 bias = ori_module.bias
-
-                in_features = father_node.meta["mase"].parameters["common"]["args"]["data_out_0"]["shape"][1] * father_config["channel_multiplier"]
-                out_features = out_features * config["channel_multiplier"]
+                last_linear_multi = 1
                 new_module = instantiate_linear(in_features, out_features, bias)
             parent_name, name = get_parent_name(node.target)
             setattr(graph.modules[parent_name], name, new_module)
-            father_node = node
+            
     return graph, {}
