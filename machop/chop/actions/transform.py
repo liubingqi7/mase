@@ -67,8 +67,8 @@ def transform(
             data_module=data_module,
             task=task,
         )
-        if len(graph.model.additional_inputs) > 0:
-            dummy_in = dummy_in | graph.model.additional_inputs
+        # if len(graph.model.additional_inputs) > 0:
+        #     dummy_in = dummy_in | graph.model.additional_inputs
         graph = add_common_metadata_analysis_pass(graph, pass_args=dummy_in)
         graph = add_software_metadata_analysis_pass(graph, pass_args=None)
 

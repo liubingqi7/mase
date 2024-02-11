@@ -75,7 +75,7 @@ class JSC_Lab1(nn.Module):
         self.config = info
         self.num_features = self.config.num_features
         self.num_classes = self.config.num_classes
-        hidden_layers = [64, 32]
+        hidden_layers = [32]
         self.num_neurons = [self.num_features] + hidden_layers + [self.num_classes]
         layer_list = []
         for i in range(1, len(self.num_neurons)):
@@ -101,12 +101,12 @@ class JSC_Lab1(nn.Module):
         self.module_list = nn.ModuleList(layer_list)
         
         self.bn1 = nn.BatchNorm1d(self.num_features)
-        self.bn2 = nn.BatchNorm1d(32)
-        self.bn3 = nn.BatchNorm1d(64)
+        self.bn2 = nn.BatchNorm1d(16)
+        # self.bn3 = nn.BatchNorm1d(32)
         self.conv1 = nn.Conv1d(in_channels=1, out_channels=2, kernel_size=3, stride=1, padding=1)
-        self.fc1 = nn.Linear(self.num_features * 2, 32)
-        self.fc2 = nn.Linear(32, 64)
-        self.fc3 = nn.Linear(64, out_features)
+        self.fc1 = nn.Linear(self.num_features * 2, 16)
+        # self.fc2 = nn.Linear(16, 32)
+        self.fc3 = nn.Linear(16, out_features)
         self.relu = nn.ReLU()
 
     def forward(self, x):
@@ -115,8 +115,8 @@ class JSC_Lab1(nn.Module):
         x = self.conv1(x)
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
-        x = self.fc2(self.relu(self.bn2(x)))
-
+        # x = self.fc2(self.relu(self.bn2(x)))
+        x = self.fc3(self.relu(self.bn2(x)))
 
         return x
     

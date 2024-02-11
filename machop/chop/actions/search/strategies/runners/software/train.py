@@ -222,7 +222,7 @@ class RunnerBasicTrain(SWRunnerBase):
                     lr_scheduler.step()
                     optimizer.zero_grad()
 
-        elif 0:
+        elif 1:
             max_epochs = self.config["max_epochs"]
             optimizer=self.config["optimizer"]
 
@@ -257,9 +257,9 @@ class RunnerBasicTrain(SWRunnerBase):
                     optimizer.step()
                     optimizer.zero_grad()
 
-                    total_loss += loss.item() * data.size(0)  # 累加损失
+                    total_loss += loss.item() * data.size(0)  
 
-                avg_loss = total_loss / len(train_dataloader.dataset)  # 计算平均损失
+                avg_loss = total_loss / len(train_dataloader.dataset)  
                 print(f"Epoch {epoch+1}/{max_epochs}, Training Loss: {avg_loss:.4f}")
 
             # train_iter = iter(train_dataloader)
@@ -268,12 +268,14 @@ class RunnerBasicTrain(SWRunnerBase):
             # outputs = model(**batch)
             model.model.eval()
             val_dataloader = data_module.val_dataloader()
-            data, labels = next(iter(val_dataloader))
-            data, labels = data.to(self.accelerator), labels.to(self.accelerator)
-            outputs = model.model(data)
-            loss = nn.CrossEntropyLoss()(outputs, labels)
-            self.metric(outputs, labels)
-            self.loss(loss)
+            total_loss = 0
+            for data, labels in val_dataloader:
+                data, labels = data.to(self.accelerator), labels.to(self.accelerator)
+                outputs = model.model(data) 
+                loss = nn.CrossEntropyLoss()(outputs, labels)
+                total_loss += loss.item() * data.size(0) 
+                self.metric(outputs, labels)
+            self.loss(total_loss)
             # self.compute()
         else:
             pl.seed_everything(0)
@@ -309,13 +311,17 @@ class RunnerBasicTrain(SWRunnerBase):
             print(train_params)
             train(**train_params)
 
-            # model.model.eval()
-            # val_dataloader = data_module.val_dataloader()
-            # data, labels = next(iter(val_dataloader))
-            # data, labels = data.to(self.accelerator), labels.to(self.accelerator)
-            # outputs = model.model(data)
-            # loss = nn.CrossEntropyLoss()(outputs, labels)
-            # self.metric(outputs, labels)
-            # self.loss(loss)
+            # model = 
+            valid_dataloader = data_module.val_dataloader()
+            model.model.eval()
+            total_loss = 0
+            for data, labels in tqdm(valid_dataloader, desc=f"Epoch {epoch+1}/{max_epochs}", leave=False):
+                data, labels = data.to(self.accelerator), labels.to(self.accelerator)
+                outputs = model.model(data)
+                loss = criterion(outputs, labels)
+
+                total_loss += loss.item() * data.size(0)  
+
+            avg_loss = total_loss / len(valid_dataloader.dataset)  
 
         return self.compute()
