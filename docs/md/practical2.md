@@ -47,10 +47,10 @@ sampler = "BruteForce"
 ####4. Compare the brute-force search with the TPE based search, in terms of sample efficiency. Comment on the performance difference between the two search methods.
 
 The output of both search setup is shown below:
-![Brute-force search output](bruteforce_search_quantize.png)
+![Brute-force search output](https://github.com/liubingqi7/mase/blob/main/docs/md/bruteforce_search_quantize.png?raw=true)
 
 TPE based search output:
-![TPE based search output](tpe_search_quantize.png)
+![TPE based search output](https://github.com/liubingqi7/mase/blob/main/docs/md/tpe_search_quantize.png?raw=true)
 
 Comparing the brute-force search with TPE based search, the b
 ruteforce only select 18 trials, which is caused by the restriction of the search space. The TPE goes throught the whole search space with repeated trials. In this case, the brute-force search is faster than the TPE based search due to the small search space, but the TPE based search can find better results in the case that large scale of choices are involved.
