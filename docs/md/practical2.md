@@ -1,5 +1,5 @@
 ## Lab3
-####1. Explore additional metrics that can serve as quality metrics for the search process. For example, you can consider metrics such as latency, model size, or the number of FLOPs (floating-point operations) involved in the model.
+#### 1. Explore additional metrics that can serve as quality metrics for the search process. For example, you can consider metrics such as latency, model size, or the number of FLOPs (floating-point operations) involved in the model.
 
 To evaluate a model, we could also consider the following metrics:
 - Latency: The time it takes to perform a prediction on a sample.
@@ -7,7 +7,7 @@ To evaluate a model, we could also consider the following metrics:
 - FLOPs: The number of floating-point operations required to perform a prediction.
 - BitOPs: The number of bitwise operations required to perform a prediction.
 
-####2. Implement some of these additional metrics and attempt to combine them with the accuracy or loss quality metric. It’s important to note that in this particular case, accuracy and loss actually serve as the same quality metric (do you know why?).
+#### 2. Implement some of these additional metrics and attempt to combine them with the accuracy or loss quality metric. It’s important to note that in this particular case, accuracy and loss actually serve as the same quality metric (do you know why?).
 
 Latency implemenation:
 ```python
@@ -23,7 +23,7 @@ For FLOPs and BitOPs implementation, we could call the pass defined in Lab2 and 
 
 In this particular case, the loss refers to cross-entropy loss, which represents the difference between the predicted and actual labels. At the same time, accuracy represents the percentage of correct prediction, therefore they are actually evaluating the same thing.
 
-####3. Implement the brute-force search as an additional search method within the system, this would be a new search strategy in MASE.
+#### 3. Implement the brute-force search as an additional search method within the system, this would be a new search strategy in MASE.
 
 To implement the brute-force search, we can use the implicit sampler `Optuma.BruteForceSampler` provided by the Optuna library. We could add the sample to the optuna.py file and modify the config of searching strategy to include the brute-force search.
 
@@ -44,7 +44,7 @@ timeout = 20000
 sampler = "BruteForce"
 ```
 
-####4. Compare the brute-force search with the TPE based search, in terms of sample efficiency. Comment on the performance difference between the two search methods.
+#### 4. Compare the brute-force search with the TPE based search, in terms of sample efficiency. Comment on the performance difference between the two search methods.
 
 The output of both search setup is shown below:
 ![Brute-force search output](https://github.com/liubingqi7/mase/blob/main/docs/md/bruteforce_search_quantize.png?raw=true)
@@ -93,7 +93,7 @@ for i, config in enumerate(search_spaces):
 <!-- ``` -->
 
 ## Lab4
-####1. Can you edit your code, so that we can modify the above network to have layers expanded to double their sizes? Note: you will have to change the `ReLU` also.
+#### 1. Can you edit your code, so that we can modify the above network to have layers expanded to double their sizes? Note: you will have to change the `ReLU` also.
 
 Actually, the input size of fully connected layers is determined by the output size of the previous layer, while the relu layer could be ReLU() with regards to any input sizes. Therefore, we can only modify the output size and thus we could change the redine pass and pass_config as follows:
 
@@ -181,15 +181,15 @@ pass_config = {
 }
 ```
 
-####2. In lab3, we have implemented a grid search, can we use the grid search to search for the best channel multiplier value?
+#### 2. In lab3, we have implemented a grid search, can we use the grid search to search for the best channel multiplier value?
 
 Task 2, task 3 and task 4 are related to the same question, we can use the grid search to search for the best channel multiplier value. The implementation is shown in task 4.
 
-####3. You may have noticed, one problem with the channel multiplier is that it scales all layers uniformly. Can you then design a search so that it can reach a network that can have this kind of structure?
+#### 3. You may have noticed, one problem with the channel multiplier is that it scales all layers uniformly. Can you then design a search so that it can reach a network that can have this kind of structure?
 
 As discussed in Task 1, the input channel size of the fully connected layers is determined by the output size of the previous layer. Therefore, the code in Task 1 is already designed to have the function of scaling all layers differently.
 
-####4. Integrate the search to the `chop` flow, so we can run it from the command line.
+#### 4. Integrate the search to the `chop` flow, so we can run it from the command line.
 
 To integrate the search to the `chop` flow, we need to modify the following parts:
 - Add the new search space to `machop/chop/actions/search/search_space`.

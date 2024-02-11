@@ -1,5 +1,5 @@
 ## Lab1
-####1. What is the impact of varying batch sizes and why?
+#### 1. What is the impact of varying batch sizes and why?
 
 With the current settings, different batch sizes have a obvious impact on the training results.
 
@@ -16,7 +16,7 @@ According to the table, the larger the batch size, the faster the training proce
 In addition, as the batch size increases, the curve of training and validation loss becomes more smooth and less noisy. Thus larger batch size leads to a increase in the performance of the model. But when batch size reach 512, the validation accuracy starts to decrease, which may indicate that the model stuck in a local minimum.
 
 
-####2. What is the impact of varying maximum epoch number?
+#### 2. What is the impact of varying maximum epoch number?
 
 Fixing learning rate to 0.00001 and varying maximum epoch number, we can see that the validation accuracy increases as the maximum epoch number increases.
 
@@ -30,7 +30,7 @@ Fixing learning rate to 0.00001 and varying maximum epoch number, we can see tha
 
 According to the table, as maximum epoch number increases, the model can achieve better performance on the validation set.
 
-####3. What is happening with a large learning and what is happening with a small learning rate and why? What is the relationship between learning rates and batch sizes?
+#### 3. What is happening with a large learning and what is happening with a small learning rate and why? What is the relationship between learning rates and batch sizes?
 
 Fixing maximum epoch number to 10 and varying learning rate, the result is shown in the following table.
  
@@ -47,7 +47,7 @@ According to the table, as the learning rate increases, the training and validat
 
 Theoretically, the larger batch size is, the larger learning rate should be, since larger batch size leads to a decrease in the variance of the gradient. In practice, the combination of learning rate and batch size of 0.001 and 256 may be the best choice.
 
-####4. Implement a network that has in total around 10x more parameters than the toy network.
+#### 4. Implement a network that has in total around 10x more parameters than the toy network.
 
 To implement a network that has in total around 10x more parameters than the toy network, we enlarged the number of hidden layers and nodes in each layer. The new network is shown in the following code:
 
@@ -100,7 +100,7 @@ In this network, we added two more hidden layers with 64 and 32 neurons, respect
 
 ## Lab2
 
-####1. Explain the functionality of `report_graph_analysis_pass` and its printed jargons such as `placeholder`, `get_attr` … You might find the doc of torch.fx useful.
+#### 1. Explain the functionality of `report_graph_analysis_pass` and its printed jargons such as `placeholder`, `get_attr` … You might find the doc of torch.fx useful.
 
 The fuctionality of `report_graph_analysis_pass` is to discribe the structure of a graph. Sepecifically, it takes in a mase graph, and report its structure overview and also all the layers. It's printed jargons are:
 - Placeholder refers to the number of nodes corresponding to function input
@@ -112,17 +112,17 @@ The fuctionality of `report_graph_analysis_pass` is to discribe the structure of
 
 The function also report layer types, which shows the mase operation of those node calling a module.
 
-####2. What are the functionalities of `profile_statistics_analysis_pass` and `report_node_meta_param_analysis_pass` respectively?
+#### 2. What are the functionalities of `profile_statistics_analysis_pass` and `report_node_meta_param_analysis_pass` respectively?
 
 The `profile_statistics_analysis_pass` is to add statistics profile to a graph. It acquire the weight and bias of target node, and also the statistic of activation nodes such as its input data, then calculate the mean, variance, and standard deviation of the target parameters. The results of this pass are saved in the node's meta-parameters as `['stats']`.
 
 The `report_node_meta_param_analysis_pass` present the statistics of the graph's nodes. It prints the meta-parameters of each node, including the `stats` parameter added by `profile_statistics_analysis_pass`.
 
-####3. Explain why only 1 OP is changed after the `quantize_transform_pass`.
+#### 3. Explain why only 1 OP is changed after the `quantize_transform_pass`.
 
 The `quantize_transform_pass` is to transform the target float nodes to a quantized nodes. It firstly replace the float nodes with quantized nodes. In the config `pass_args` of the pass, it only included linear type nodes, and there is only one linear type node in the graph. Therefore, only one node is transformed.
 
-####4. Write some code to traverse both `mg` and `ori_mg`, check and comment on the nodes in these two graphs. You might find the source code for the implementation of `summarize_quantization_analysis_pass` useful.
+#### 4. Write some code to traverse both `mg` and `ori_mg`, check and comment on the nodes in these two graphs. You might find the source code for the implementation of `summarize_quantization_analysis_pass` useful.
 
 We could traverse the graph with the following code:
 
@@ -219,7 +219,7 @@ tensor([ 0.1483, -0.1248, -0.1439, -0.1684,  0.1843], requires_grad=True)}}
 
 Here we could see that the precision and type of the weights, bias and data_in changed from float32 to integer.
 
-####5. Perform the same quantisation flow to the bigger JSC network that you have trained in lab1. You must be aware that now the `pass_args` for your custom network might be different if you have used more than the `Linear layer` in your network.
+#### 5. you have trained in lab1. You must be aware that now the `pass_args` for your custom network might be different if you have used more than the `Linear layer` in your network.
 
 The bigger JSC network include 2 linear layer and a `conv1d` layer. The `pass_args` for this network should be:
 
@@ -261,7 +261,7 @@ pass_args = {
 
 Then by executing the same quantization code `mg, _ = quantize_transform_pass(mg, pass_args)`, we can get the quantized graph.
 
-####6. Write code to show and verify that the weights of these layers are indeed quantised. You might need to go through the source code of the implementation of the quantisation pass and also the implementation of the Quantized Layers.
+#### 6. Write code to show and verify that the weights of these layers are indeed quantised. You might need to go through the source code of the implementation of the quantisation pass and also the implementation of the Quantized Layers.
 
 We could verify the weights are indeed quantised by comparing the output of both models given the same input. The code for generating input data and running forward is as follows:
 
@@ -299,7 +299,7 @@ tensor([[  3.1523,   0.9688, -13.7188, -19.9180,   6.8203],
 
 We can see that the output of the quantized model is changed slightly.
 
-####7. Load your own pre-trained JSC network, and perform perform the quantisation using the command line interface.
+#### 7. Load your own pre-trained JSC network, and perform perform the quantisation using the command line interface.
 
 ## Optional Task: Write your own pass
 
