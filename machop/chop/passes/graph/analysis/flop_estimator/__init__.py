@@ -3,7 +3,7 @@ import torch
 from ..utils import _import_config_from_py_file
 # from .deepspeed import estimate_sw_deepspeed
 # from .fine_grained import estimate_sw_fine_grained
-from .flop_estimate import flops_statistics_analysis_pass
+from .flop_estimate import flops_statistics_analysis_pass, bits_statistics_analysis_pass
 
 # estimator_style_map = {
 #     "deepspeed": estimate_sw_deepspeed,

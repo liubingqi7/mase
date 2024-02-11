@@ -8,12 +8,21 @@ import torch
 class JSC_Toy(nn.Module):
     def __init__(self, info):
         super(JSC_Toy, self).__init__()
-        self.param = nn.Parameter(torch.rand(3, 4))
-        self.linear = nn.Linear(16, 5)
+        self.seq_blocks = nn.Sequential(
+            # 1st LogicNets Layer
+            nn.BatchNorm1d(16),  # input_quant       # 0
+            nn.ReLU(16),  # 1
+            nn.Linear(16, 5),  # linear              # 2
+            # nn.BatchNorm1d(5),  # output_quant       # 3
+            nn.ReLU(5),  # 4
+        )
+        self.fc1 = nn.Linear(16, 5)
 
     def forward(self, x):
-        return torch.topk(torch.sum(
-            self.linear(x + self.linear.weight).relu(), dim=-1), 3)
+        x1 = self.seq_blocks(x)
+        x2 = self.fc1(x)
+
+        return x1+x2
 
 
 
