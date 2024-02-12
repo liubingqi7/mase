@@ -47,13 +47,25 @@ sampler = "BruteForce"
 #### 4. Compare the brute-force search with the TPE based search, in terms of sample efficiency. Comment on the performance difference between the two search methods.
 
 The output of both search setup is shown below:
-![Brute-force search output](https://github.com/liubingqi7/mase/blob/main/docs/md/bruteforce_search_quantize.png?raw=true)
-
 TPE based search output:
-![TPE based search output](https://github.com/liubingqi7/mase/blob/main/docs/md/tpe_search_quantize.png?raw=true)
+
+|    |   number | software_metrics                   | hardware_metrics                                  | scaled_metrics                                              |
+|---:|---------:|:----------------------------------|:--------------------------------------------------|:------------------------------------------------------------|
+|  0 |        0 | {'loss': 0.825, 'accuracy': 0.717} | {'average_bitwidth': 8.0, 'memory_density': 4.0}  | {'accuracy': 0.717, 'average_bitwidth': 1.6, 'loss': 0.825} |
+|  1 |        1 | {'loss': 0.879, 'accuracy': 0.683} | {'average_bitwidth': 4.0, 'memory_density': 8.0}  | {'accuracy': 0.683, 'average_bitwidth': 0.8, 'loss': 0.879} |
+|  2 |       10 | {'loss': 1.002, 'accuracy': 0.601} | {'average_bitwidth': 2.0, 'memory_density': 16.0} | {'accuracy': 0.601, 'average_bitwidth': 0.4, 'loss': 1.002} |
+
+Brute-force based search output:
+
+|    |   number | software_metrics                   | hardware_metrics                                  | scaled_metrics                                              |
+|---:|---------:|:----------------------------------|:--------------------------------------------------|:------------------------------------------------------------|
+|  0 |        0 | {'loss': 0.829, 'accuracy': 0.719} | {'average_bitwidth': 8.0, 'memory_density': 4.0}  | {'accuracy': 0.719, 'average_bitwidth': 1.6, 'loss': 0.829} |
+|  1 |       10 | {'loss': 1.046, 'accuracy': 0.581} | {'average_bitwidth': 4.0, 'memory_density': 8.0}  | {'accuracy': 0.581, 'average_bitwidth': 0.8, 'loss': 1.046} |
+|  2 |       11 | {'loss': 1.069, 'accuracy': 0.569} | {'average_bitwidth': 2.0, 'memory_density': 16.0} | {'accuracy': 0.569, 'average_bitwidth': 0.4, 'loss': 1.069} |
 
 Comparing the brute-force search with TPE based search, the b
-ruteforce only select 18 trials, which is caused by the restriction of the search space. The TPE goes throught the whole search space with repeated trials. In this case, the brute-force search is faster than the TPE based search due to the small search space, but the TPE based search can find better results in the case that large scale of choices are involved.
+ruteforce only select 18 trials, which is caused by the restriction of the search space. It comes out with three possible trials.
+The TPE goes throught the whole search space with repeated trials. In this case, the brute-force search is faster than the TPE based search due to the small search space, but the TPE based search can find better results in the case that large scale of choices are involved.
 
 <!-- Based on the given code, we can implement the brute-force search as follows:
 
